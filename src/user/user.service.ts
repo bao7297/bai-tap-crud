@@ -1,9 +1,13 @@
 import { Injectable } from '@nestjs/common';
+
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 
 @Injectable()
 export class UserService {
+  save(arg0: { name: String; email: String; }) {
+    throw new Error('Method not implemented.');
+  }
   create(createUserDto: CreateUserDto) {
     return 'This action adds a new user';
   }

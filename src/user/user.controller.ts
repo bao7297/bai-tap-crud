@@ -1,34 +1,64 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
-import { UserService } from './user.service';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
+} from '@nestjs/common';
+
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { User } from './entities/user.entity';
+import { UserService } from './user.service';
 
 @Controller('user')
 export class UserController {
-  constructor(private readonly userService: UserService) {}
+  constructor(private readonly userService: UserService) { }
+  private user: User[] = [];
 
   @Post()
   create(@Body() createUserDto: CreateUserDto) {
-    return this.userService.create(createUserDto);
+    const user = {
+      ...createUserDto,
+      name: new String(createUserDto.name),
+      id: this.user.length + 1
+    };
+    this.user.push(user);
+    return user;
   }
 
   @Get()
   findAll() {
-    return this.userService.findAll();
+    return this.user;
   }
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.userService.findOne(+id);
+    const user = this.user.find(
+      user => user.id === parseInt(id)
+    );
   }
 
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-    return this.userService.update(+id, updateUserDto);
+    const index = this.user.findIndex(
+      user => user.id === parseInt(id)
+    );
+
+    this.user[index] = {
+      ...this.user[index],
+      ...updateUserDto,
+      name: updateUserDto.name ?
+        new String(updateUserDto.name) : this.user[index].name
+    }
+    return this.user[index];
   }
 
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.userService.remove(+id);
+    this.user = this.user.filter(
+      user => user.id !==  parseInt(id));
   }
 }
